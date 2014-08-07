@@ -4,7 +4,6 @@ var ws;
 function Wetty(argv) {
     this.argv_ = argv;
     this.io = null;
-    this.pid_ = -1;
 }
 
 Wetty.prototype.run = function() {

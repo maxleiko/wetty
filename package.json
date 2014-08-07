@@ -3,10 +3,10 @@
   "version": "0.0.8",
   "dependencies": {
     "express": "3.5.1",
-    "websocket": "",
-    "pty.js": "",
-    "optimist": "",
-    "waitpid": ""
+    "optimist": "^0.6.1",
+    "pty.js": "^0.2.4",
+    "waitpid": "^0.1.1",
+    "websocket": "^1.0.8"
   },
   "description": "Wetty = Web + tty. Terminal access in browser over http/https ",
   "main": "app.js",
