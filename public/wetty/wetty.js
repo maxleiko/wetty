@@ -13,7 +13,7 @@ Wetty.prototype.run = function() {
     this.io.onVTKeystroke = this.sendString_.bind(this);
     this.io.sendString = this.sendString_.bind(this);
     this.io.onTerminalResize = this.onTerminalResize.bind(this);
-}
+};
 
 Wetty.prototype.sendString_ = function(str) {
     ws.send(JSON.stringify({
@@ -46,17 +46,17 @@ ws.onopen = function() {
             row: term.screenSize.height
         }));
     });
-}
+};
 ws.onmessage = function(msg) {
     if (!msg || !msg.data)
         return;
     var data = JSON.parse(msg.data);
     if (term)
         term.io.writeUTF16(data.data);
-}
+};
 ws.onerror = function(e) {
     console.log("WebSocket connection error");
-}
+};
 ws.onclose = function() {
     console.log("WebSocket connection closed");
-}
+};

@@ -7,7 +7,7 @@ var pty = require('pty.js');
 var fs = require('fs');
 var waitpid = require('waitpid');
 
-process.on('SIGCHLD', function(args){
+process.on('SIGCHLD', function() {
     waitpid(-1);
 });
 
@@ -42,6 +42,10 @@ var opts = require('optimist')
             alias: 'p',
             description: 'wetty listen port'
         },
+        prefix: {
+            demand: false,
+            description: 'http routes prefix'
+        }
     }).boolean('allow_discovery').argv;
 
 var runhttps = false;
@@ -49,6 +53,7 @@ var sshport = 22;
 var sshhost = 'localhost';
 var sshauth = 'password';
 var globalsshuser = '';
+var prefix = '/';
 
 if (opts.sshport) {
     sshport = opts.sshport;
@@ -59,7 +64,7 @@ if (opts.sshhost) {
 }
 
 if (opts.sshauth) {
-	sshauth = opts.sshauth
+    sshauth = opts.sshauth
 }
 
 if (opts.sshuser) {
@@ -73,6 +78,19 @@ if (opts.sslkey && opts.sslcert) {
     opts.ssl['cert'] = fs.readFileSync(path.resolve(opts.sslcert));
 }
 
+if (opts.prefix) {
+    prefix = opts.prefix;
+    if (prefix.substr(0, 1) !== '/') {
+        prefix = '/' + prefix;
+    }
+
+    if (prefix.substr(prefix.length -1) !== '/') {
+        prefix += '/';
+    }
+}
+
+console.log('PREFIX= '+prefix);
+
 process.on('uncaughtException', function(e) {
     console.error('Error: ' + e);
 });
@@ -80,18 +98,18 @@ process.on('uncaughtException', function(e) {
 var httpserv;
 
 var app = express();
-app.get('/wetty/ssh/:user', function(req, res) {
+app.get(prefix+'wetty/ssh/:user', function(req, res) {
     res.sendfile(__dirname + '/public/wetty/index.html');
 });
-app.use('/', express.static(path.join(__dirname, 'public')));
+app.use(prefix, express.static(path.join(__dirname, 'public')));
 
 if (runhttps) {
     httpserv = https.createServer(opts.ssl, app).listen(opts.port, function() {
-        console.log('https on port ' + opts.port);
+        console.log('https on port ' + opts.port + ' using prefix ' + prefix);
     });
 } else {
     httpserv = http.createServer(app).listen(opts.port, function() {
-        console.log('http on port ' + opts.port);
+        console.log('http on port ' + opts.port + ' using prefix ' + prefix);
     });
 }
 
@@ -149,4 +167,4 @@ wss.on('request', function(request) {
     conn.on('close', function() {
         term.end();
     })
-})
+});
